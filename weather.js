@@ -1,5 +1,6 @@
 //Things to do: 
 //1) Error Handling implementation
+//2) Delete data in weather container between each call. HERE ******
 //3) Loading component
 //4) Style the damn thing. 
 //        -> everything outside info section is blue with hand-drawn clouds
@@ -105,7 +106,15 @@ const weatherApp = (function(){
 
         const weatherContainer = document.querySelector('#weatherContainer');
 
-        let toggleLatentData = function(hidden, spanElement){
+        const removePriorData = (function(){
+            if(weatherContainer.children.length > 0){
+                Array.from(weatherContainer.children).forEach(
+                    node => node.remove()
+                )
+            }
+        })()
+
+        let toggleLatentData = function(spanElement){
             hidden = this.hidden;
             if (hidden){
                 spanElement.classList.toggle('none', true)
@@ -120,7 +129,7 @@ const weatherApp = (function(){
             else if (obj.hasOwnProperty('Time')){
                 this.hidden = true;
             }
-            toggleLatentData(hidden,component)  
+            toggleLatentData(component)  
         }
         
         const convertorFunction = (function(){
