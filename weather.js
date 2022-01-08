@@ -16,23 +16,7 @@ const weatherApp = (function(){
 
         ];
 
-        const dateParser = function(currentDate = '1500-01-01'){
 
-            const dateChecker = function(dateString){
-                const thisDate = dateString.slice(0,10);
-
-                if (currentDate === thisDate){
-                    return [dateString.slice(10,), currentDate]
-                }
-                currentDate = thisDate;
-                return [dateString, currentDate]
-    
-            }
-
-            return dateChecker
-
-            
-        }
         
 
         const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
@@ -53,52 +37,65 @@ const weatherApp = (function(){
         
         const parseAllValues = function(){
             const finalArray = []
-
-            let dateChecker = dateParser();
-
-            const dateFixer = function(){
-                    
-                if (finalArray.length === 0){
-                    return
-                }
-                let last = finalArray[finalArray.length - 1];
-                if (last.hasOwnProperty('Date')){
-
-                    //Call dateChecker function
-                    dateChecked = dateChecker(last['Date']);
-
-                    //Update date if necessary, else give time instead.
-                    last['Date'] = dateChecked[0];
-
-                    if(last['Date'].length < 11){
-
-                        last['Time'] = dateChecked[0];
-                        delete last['Date'];
-                    }
-
-                    //Renew currentDate
-                    let currentDate = dateChecked[1];
-
-                    //Update dateChecker function with updated currentDate for next iteration.
-                    dateChecker = dateParser(currentDate);        
-
-                }
-            }
+            this.currentDate = '1500-01-01'
 
             for (let elem of weatherData.list){
                        
                 parseIndividualValue(labelsAndTargets, finalArray, elem);
-                dateFixer();
+                dateFixer(finalArray);
                 parseIndividualValue(labelsAndTargets, finalArray, elem.main);
                 parseIndividualValue(labelsAndTargets, finalArray, elem.weather[0])
             }
             return finalArray; 
-        }    
+        } 
+        
+        const dateChecker = function(dateString){
+            currentDate = this.currentDate;
+           
+            const thisDate = dateString.slice(0,10);
+
+            if (currentDate === thisDate){
+                return [dateString.slice(10,), currentDate]
+            }
+            currentDate = thisDate;
+            return [dateString, currentDate]
+    
+        }.bind(parseAllValues)
+
+        const dateFixer = function(finalArray){
+               
+            if (finalArray.length === 0){
+                return
+            }
+            let last = finalArray[finalArray.length - 1];
+            if (last.hasOwnProperty('Date')){
+ 
+                //Call dateChecker function
+                dateChecked = dateChecker(last['Date']);
+ 
+                //Update date if necessary, else give time instead.
+                last['Date'] = dateChecked[0];
+ 
+                if(last['Date'].length < 11){
+                    last['Time'] = dateChecked[0];
+                    delete last['Date'];
+                }
+ 
+                //Renew currentDate
+                let currentDate = dateChecked[1];
+ 
+                //Update dateChecker function with updated currentDate for next iteration.
+                this.currentDate = currentDate      
+ 
+            }
+        }.bind(parseAllValues)
 
         
         return parseAllValues()    
         
         }
+
+       
         
     const weatherObjectToDOM = function(finalArray){
 
