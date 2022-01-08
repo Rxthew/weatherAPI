@@ -1,3 +1,11 @@
+//Things to do: 
+//1) Error Handling implementation
+//3) Loading component
+//4) Style the damn thing. 
+//        -> everything outside info section is blue with hand-drawn clouds
+//        -> Five cards. One larger one at the top representing today. Four at the bottom. You toggle +3 or -3 hours and they all change corresponding to that. 
+//5) Download linter & prettify to check against.  
+
 
 const weatherApp = (function(){
     const submit = document.querySelector('#submitCity')
@@ -15,9 +23,6 @@ const weatherApp = (function(){
 
 
         ];
-
-
-        
 
         const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
             for (let someLabelAndTarget of someLabelsAndTargets){
@@ -94,27 +99,58 @@ const weatherApp = (function(){
         return parseAllValues()    
         
         }
-
        
         
     const weatherObjectToDOM = function(finalArray){
 
         const weatherContainer = document.querySelector('#weatherContainer');
 
+        let toggleLatentData = function(hidden, spanElement){
+            hidden = this.hidden;
+            if (hidden){
+                spanElement.classList.toggle('none', true)
+            }
+        }
+
+        let guardForVisibility = function(obj,component){
+            if(obj.hasOwnProperty('Date')){
+                this.hidden = false;
+                
+            }
+            else if (obj.hasOwnProperty('Time')){
+                this.hidden = true;
+            }
+            toggleLatentData(hidden,component)  
+        }
+        
         const convertorFunction = (function(){
+            
+            const bindHelperFunctions = (function(){
+                this.hidden = false;
+                toggleLatentData = toggleLatentData.bind(this);
+                guardForVisibility = guardForVisibility.bind(this);
+            })()
+                
             for (let obj of finalArray){
+                
+                let card = (function(){
+                    if(obj.hasOwnProperty('Date')){
+                        return document.createElement('div')
+                    }
+                    return document.querySelectorAll('div')[document.querySelectorAll('div').length - 1]
+                })()
+
                 let component = document.createElement('span');
-                let text = document.createElement('p');
-                text.textContent = (function(){
+                guardForVisibility(obj, component)
+                component.textContent = (function(){
                     for (let [key,value] of Object.entries(obj)){
                         return `${key} : ${value}`
                     }  
                 })()
-                component.appendChild(text)
-                weatherContainer.appendChild(component)
+                card.appendChild(component)
+                weatherContainer.appendChild(card)
             }
         })()
-
 
         return
     }    
@@ -123,6 +159,7 @@ const weatherApp = (function(){
                          let city = document.querySelector('#cityInput').value;
                          fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=${key}`, {mode:'cors'})
                         .then(function(response){return response.json()})
+                        //.then(function(info){console.log(parseWeatherData(info))})
                         .then(function(info){return parseWeatherData(info)})
                         .then(function(weatherObj){return weatherObjectToDOM(weatherObj)})
     }
