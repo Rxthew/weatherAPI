@@ -1,6 +1,6 @@
 //Things to do: 
 //1) Error Handling implementation
-//2) Delete data in weather container between each call. HERE ******
+//2)
 //3) Loading component
 //4) Style the damn thing. 
 //        -> everything outside info section is blue with hand-drawn clouds
@@ -11,6 +11,11 @@
 const weatherApp = (function(){
     const submit = document.querySelector('#submitCity')
     const key = 'def79d73d53551dbf22c188d97884e98';
+    const malleables = {
+        'currentDate': '1500-01-01',
+        'benchmarkTime': '25:00:00',
+         'hidden' : false
+    }
     const parseWeatherData = function(weatherData){
        
         //Array of labels to be used, and object keys from weatherData to return values we need//
@@ -25,6 +30,7 @@ const weatherApp = (function(){
 
         ];
 
+        
         const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
             for (let someLabelAndTarget of someLabelsAndTargets){
     
@@ -43,30 +49,43 @@ const weatherApp = (function(){
         
         const parseAllValues = function(){
             const finalArray = []
-            this.currentDate = '1500-01-01'
+            
 
             for (let elem of weatherData.list){
-                       
                 parseIndividualValue(labelsAndTargets, finalArray, elem);
                 dateFixer(finalArray);
                 parseIndividualValue(labelsAndTargets, finalArray, elem.main);
                 parseIndividualValue(labelsAndTargets, finalArray, elem.weather[0])
             }
             return finalArray; 
-        } 
+        }
         
-        const dateChecker = function(dateString){
-            currentDate = this.currentDate;
-           
-            const thisDate = dateString.slice(0,10);
-
-            if (currentDate === thisDate){
-                return [dateString.slice(10,), currentDate]
+        const markBenchmarkTime = function(timeString){
+               let benchmarkTime = malleables.benchmarkTime;
+            if (benchmarkTime === '25:00:00'){
+                malleables.benchmarkTime = timeString
             }
-            currentDate = thisDate;
-            return [dateString, currentDate]
+            return malleables.benchmarkTime
+        }
+        
+        const timeHarmoniser = function(dateString){
+
+            const thisDate = dateString.slice(0,10);
+            const thisTime = dateString.slice(11,)
+            let currentDate = malleables.currentDate;
+            let benchmarkTime = markBenchmarkTime(thisTime);
+           
+            if (currentDate !== thisDate){
+                malleables.currentDate = thisDate;
+                currentDate = thisDate;
+            }
+            if (benchmarkTime !== thisTime){
+                return [thisTime, currentDate]
+            }
+
+            return [dateString, currentDate,thisTime]
     
-        }.bind(parseAllValues)
+        }
 
         const dateFixer = function(finalArray){
                
@@ -76,25 +95,24 @@ const weatherApp = (function(){
             let last = finalArray[finalArray.length - 1];
             if (last.hasOwnProperty('Date')){
  
-                //Call dateChecker function
-                dateChecked = dateChecker(last['Date']);
+                //Call timeHarmoniser function
+                let dateChecked = timeHarmoniser(last['Date']);
  
-                //Update date if necessary, else give time instead.
+                //Update date and time if necessary, else give time instead.
                 last['Date'] = dateChecked[0];
+
  
                 if(last['Date'].length < 11){
                     last['Time'] = dateChecked[0];
                     delete last['Date'];
                 }
- 
-                //Renew currentDate
-                let currentDate = dateChecked[1];
- 
-                //Update dateChecker function with updated currentDate for next iteration.
-                this.currentDate = currentDate      
- 
+                else {
+                    last['Date'] = dateChecked[1];
+                    last['Time'] = dateChecked[2];
+                }
+
             }
-        }.bind(parseAllValues)
+        }
 
         
         return parseAllValues()    
@@ -115,35 +133,33 @@ const weatherApp = (function(){
         })()
 
         let toggleLatentData = function(spanElement){
-            hidden = this.hidden;
+            let hidden = malleables.hidden;
             if (hidden){
                 spanElement.classList.toggle('none', true)
             }
         }
 
         let guardForVisibility = function(obj,component){
-            if(obj.hasOwnProperty('Date')){
-                this.hidden = false;
+            if(obj.hasOwnProperty('Time')){
+                if(obj.hasOwnProperty('Date')){
+                    malleables.hidden = false;
+                    
+                }
+                else {
+                    malleables.hidden = true;
+                }
                 
             }
-            else if (obj.hasOwnProperty('Time')){
-                this.hidden = true;
-            }
             toggleLatentData(component)  
+                
         }
         
         const convertorFunction = (function(){
-            
-            const bindHelperFunctions = (function(){
-                this.hidden = false;
-                toggleLatentData = toggleLatentData.bind(this);
-                guardForVisibility = guardForVisibility.bind(this);
-            })()
-                
+                           
             for (let obj of finalArray){
                 
                 let card = (function(){
-                    if(obj.hasOwnProperty('Date')){
+                    if(weatherContainer.children.length === 0 || obj['Time'] === '00:00:00'){
                         return document.createElement('div')
                     }
                     return document.querySelectorAll('div')[document.querySelectorAll('div').length - 1]
@@ -151,10 +167,11 @@ const weatherApp = (function(){
 
                 let component = document.createElement('span');
                 guardForVisibility(obj, component)
-                component.textContent = (function(){
+                const populateComponent = (function(){
                     for (let [key,value] of Object.entries(obj)){
-                        return `${key} : ${value}`
-                    }  
+                         component.textContent += `${key} : ${value} `
+                    }
+                    return       
                 })()
                 card.appendChild(component)
                 weatherContainer.appendChild(card)
