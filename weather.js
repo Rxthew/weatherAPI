@@ -1,12 +1,3 @@
-//Things to do: 
-//1) Error Handling implementation
-//2)
-//3) Loading component
-//4) Style the damn thing. 
-//        -> everything outside info section is blue with hand-drawn clouds
-//        -> Five cards. One larger one at the top representing today. Four at the bottom. You toggle +3 or -3 hours and they all change corresponding to that. 
-//5) Download linter & prettify to check against.  
-
 
 const weatherApp = (function(){
     const submit = document.querySelector('#submitCity')
@@ -24,8 +15,8 @@ const weatherApp = (function(){
             ['Date', 'dt_txt'],
             ['Forecast', 'description'],
             ['Temperature', 'temp'],
-            ['Humidity', 'humidity'],
-            ['Feels like', 'feels_like'],
+            ['humidity', 'humidity'],
+            ['feels like', 'feels_like'],
 
 
         ];
@@ -153,6 +144,48 @@ const weatherApp = (function(){
             toggleLatentData(component)  
                 
         }
+
+        const weatherTextHandler = function(obj,component){
+            const dateAndTime = function(){
+                component.textContent = `${Object.values(obj)[0]} ${Object.values(obj)[1]}`
+                return
+
+            }
+            const metricSpecificData = function(){
+                if(obj.hasOwnProperty('humidity')){
+                    component.textContent = `${Object.entries(obj)[0][1]}% ${Object.entries(obj)[0][0]}`
+                    return 
+                }
+                else if (obj.hasOwnProperty('feels like')){
+                    component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`
+                    return
+
+                }
+                else {
+                    component.textContent = `${Object.values(obj)[0]}\u2109`
+                    return
+                }
+
+            }
+            const forecast = function(){
+                component.textContent = `${Object.values(obj)[0]}`
+                //component.classList.toggle('forecast');
+                return
+
+            }
+
+            const writeAccordingToOutcome = (function(){
+                if (obj.hasOwnProperty('Forecast')){
+                    return forecast();
+                }
+                else if(obj.hasOwnProperty('Time')){
+                    return dateAndTime();
+                }
+                else{
+                    return metricSpecificData();
+                }
+            })()
+        }
         
         const convertorFunction = (function(){
                            
@@ -160,19 +193,16 @@ const weatherApp = (function(){
                 
                 let card = (function(){
                     if(weatherContainer.children.length === 0 || obj['Time'] === '00:00:00'){
-                        return document.createElement('div')
+                        let div =  document.createElement('div');
+                        div.classList.toggle('card',true);
+                        return div;
                     }
                     return document.querySelectorAll('div')[document.querySelectorAll('div').length - 1]
                 })()
 
                 let component = document.createElement('span');
                 guardForVisibility(obj, component)
-                const populateComponent = (function(){
-                    for (let [key,value] of Object.entries(obj)){
-                         component.textContent += `${key} : ${value} `
-                    }
-                    return       
-                })()
+                weatherTextHandler(obj, component)
                 card.appendChild(component)
                 weatherContainer.appendChild(card)
             }
