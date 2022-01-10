@@ -195,23 +195,53 @@ const weatherApp = (function(){
         }
         
         const convertorFunction = (function(){
-                           
+
+            const secondaryContainer = (function(){
+                const secondary = document.createElement('div');
+                secondary.id = 'secondaryContainer';
+                weatherContainer.appendChild(secondary);
+                return secondary;
+            })()
+               
             for (let obj of finalArray){
                 
                 let card = (function(){
-                    if(weatherContainer.children.length === 0 || obj['Time'] === '00:00:00'){
+                    if(weatherContainer.children.length === 1 || obj['Time'] === '00:00:00'){
                         let div =  document.createElement('div');
                         div.classList.toggle('card',true);
                         return div;
                     }
-                    return document.querySelectorAll('div')[document.querySelectorAll('div').length - 1]
+                    if (secondaryContainer.children.length !== 0){
+                        return secondaryContainer.children[secondaryContainer.children.length - 1]
+                    }
+                    return document.querySelector('.mainCard')
                 })()
 
                 let component = document.createElement('span');
                 guardForVisibility(obj, component)
                 weatherTextHandler(obj, component)
                 card.appendChild(component)
-                weatherContainer.appendChild(card)
+
+                
+                const mainOrSecondary = (function(){
+
+                    const weatherContChildren = Array.from(weatherContainer.children);
+                    const secondaryContChildren = Array.from(secondaryContainer.children);
+
+                    if(weatherContainer.children.length === 1){
+                        card.classList.toggle('mainCard', true)
+
+                        if(!weatherContChildren.includes(card)){
+                        weatherContainer.appendChild(card);
+                        }
+                    }
+                    else{
+                        if(!weatherContChildren.includes(card) && !secondaryContChildren.includes(card)){
+                            secondaryContainer.appendChild(card);
+                        }                            
+                    }
+                }())
+                
             }
         })()
 
