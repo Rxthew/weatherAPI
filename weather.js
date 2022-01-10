@@ -44,7 +44,7 @@ const weatherApp = (function(){
 
             for (let elem of weatherData.list){
                 parseIndividualValue(labelsAndTargets, finalArray, elem);
-                dateFixer(finalArray);
+                implementTime(finalArray);
                 parseIndividualValue(labelsAndTargets, finalArray, elem.main);
                 parseIndividualValue(labelsAndTargets, finalArray, elem.weather[0])
             }
@@ -57,6 +57,13 @@ const weatherApp = (function(){
                 malleables.benchmarkTime = timeString
             }
             return malleables.benchmarkTime
+        }
+
+        const dateFixer = function(date){
+            const newDate = new Date(date);
+            const fixedDate = newDate.toString().slice(0,15);
+            return fixedDate
+
         }
         
         const timeHarmoniser = function(dateString){
@@ -78,7 +85,7 @@ const weatherApp = (function(){
     
         }
 
-        const dateFixer = function(finalArray){
+        const implementTime = function(finalArray){
                
             if (finalArray.length === 0){
                 return
@@ -98,7 +105,7 @@ const weatherApp = (function(){
                     delete last['Date'];
                 }
                 else {
-                    last['Date'] = dateChecked[1];
+                    last['Date'] = dateFixer(dateChecked[1]);
                     last['Time'] = dateChecked[2];
                 }
 
