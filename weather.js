@@ -118,10 +118,10 @@ const weatherApp = (function(){
             }
         })()
 
-        let toggleHideData = function(spanElement){
+        let toggleHideData = function(someElement){
             let hidden = malleables.hidden;
             if (hidden){
-                spanElement.classList.toggle('none', true)
+                someElement.classList.toggle('none', true)
             }
         }
 
@@ -149,42 +149,79 @@ const weatherApp = (function(){
             // 4.5 In the meantime, if it's not a time class then toggle none
             // 4. Once next time class is found toggle none off on that time class
             // 5. Keep iterating and toggling time off on the next elements until you reach the next Time.
-            //2 problems: What about Date? 
+            //2 problems:
             // also: what if the Time is 21:00
-
+            return
         }
 
-        const weatherTextHandler = function(obj,component){
+        const componentHandler = function(obj){
+
             const dateAndTime = function(){
-                component.textContent = `${Object.values(obj)[0]} ${Object.values(obj)[1]}`
-                component.classList.toggle('Time',true)
-                //From this point onward apply timeToggler. Still need to figure out how to implement range.
-                return
+                let div = document.createElement('div');
+                div.classList.toggle('Time',true)
+
+               const dateText = (function(){
+                   let dateComponent = document.createElement('span');
+                   dateComponent.textContent = `${Object.values(obj)[0]}`;
+                   dateComponent.classList.toggle('dateText',true)
+                   div.appendChild(dateComponent);
+               })()
+
+                const earlierButton = (function(){
+                    let earlier = document.createElement('button');
+                    earlier.textContent = 'Earlier';
+                    earlier.classList.toggle('earlier',true);
+                    earlier.addEventListener('click',timeToggler)
+                    div.appendChild(earlier);                   
+                })()
+            
+                const timeText = (function(){
+                    let component = document.createElement('input');
+                    component.setAttribute('type','text');
+                    component.setAttribute('readonly',true);
+                    component.value = `${Object.values(obj)[1]}`
+                    component.classList.toggle('timeText',true)
+                    div.appendChild(component);
+                    
+                })()
+
+                const laterButton = (function(){
+                    let later = document.createElement('button');
+                    later.textContent = 'Later';
+                    later.classList.toggle('later',true);
+                    later.addEventListener('click',timeToggler)
+                    div.appendChild(later);
+                    
+                })()
+
+                return div
 
             }
             const metricSpecificData = function(){
+                let component = document.createElement('span');
                 if(obj.hasOwnProperty('humidity')){
                     component.textContent = `${Object.entries(obj)[0][1]}% ${Object.entries(obj)[0][0]}`;
                     component.classList.toggle(`${Object.entries(obj)[0][0]}`,true);
-                    return 
+                    return component
                 }
                 else if (obj.hasOwnProperty('feels like')){
                     component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`;
                     component.classList.toggle('feelsLike',true)
-                    return
+                    return component
 
                 }
                 else {
                     component.textContent = `${Object.values(obj)[0]}\u2109`;
                     component.classList.toggle(`${Object.keys(obj)[0]}`,true)
-                    return
+                    return component
                 }
 
             }
             const forecast = function(){
+                let component = document.createElement('span');
                 component.textContent = `${Object.values(obj)[0]}`
                 component.classList.toggle(`${Object.keys(obj)[0]}`,true)
-                return
+                return component
 
             }
 
@@ -199,6 +236,8 @@ const weatherApp = (function(){
                     return metricSpecificData();
                 }
             })()
+
+            return writeAccordingToOutcome
         }
         
         const convertorFunction = (function(){
@@ -223,10 +262,11 @@ const weatherApp = (function(){
                     }
                     return document.querySelector('.mainCard')
                 })()
-
-                let component = document.createElement('span');
+                
+                //let component = document.createElement('span');
+                let component = componentHandler(obj)
                 guardForVisibility(obj, component)
-                weatherTextHandler(obj, component)
+                //weatherTextHandler(obj, component)
                 card.appendChild(component)
 
                 
