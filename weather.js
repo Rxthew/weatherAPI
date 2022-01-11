@@ -51,7 +51,7 @@ const weatherApp = (function(){
             return finalArray; 
         }
         
-        const markBenchmarkTime = function(timeString){
+        const setBenchmarkTime = function(timeString){
                let benchmarkTime = malleables.benchmarkTime;
             if (benchmarkTime === '25:00:00'){
                 malleables.benchmarkTime = timeString
@@ -71,7 +71,7 @@ const weatherApp = (function(){
             const thisDate = dateString.slice(0,10);
             const thisTime = dateString.slice(11,)
             let currentDate = malleables.currentDate;
-            let benchmarkTime = markBenchmarkTime(thisTime);
+            let benchmarkTime = setBenchmarkTime(thisTime);
            
             if (currentDate !== thisDate){
                 malleables.currentDate = thisDate;
@@ -130,7 +130,7 @@ const weatherApp = (function(){
             }
         })()
 
-        let toggleLatentData = function(spanElement){
+        let toggleHideData = function(spanElement){
             let hidden = malleables.hidden;
             if (hidden){
                 spanElement.classList.toggle('none', true)
@@ -148,14 +148,29 @@ const weatherApp = (function(){
                 }
                 
             }
-            toggleLatentData(component)  
+            toggleHideData(component)  
                 
+        }
+
+        const timeToggler = function(){
+            //two buttons attached to a Time component: next and previous
+            // Next -> 1. goes up tree until get to card div.
+            // 2. Finds the index of event's target 'Time' span within card's children
+            // 3. Toggle none on that Time component
+            // 4. Starts there iterating through card div's children, looking for next Time class. 
+            // 4.5 In the meantime, if it's not a time class then toggle none
+            // 4. Once next time class is found toggle none off on that time class
+            // 5. Keep iterating and toggling time off on the next elements until you reach the next Time.
+            //2 problems: What about Date? 
+            // also: what if the Time is 21:00
+
         }
 
         const weatherTextHandler = function(obj,component){
             const dateAndTime = function(){
                 component.textContent = `${Object.values(obj)[0]} ${Object.values(obj)[1]}`
                 component.classList.toggle('Time',true)
+                //From this point onward apply timeToggler. Still need to figure out how to implement range.
                 return
 
             }
