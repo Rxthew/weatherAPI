@@ -77,11 +77,8 @@ const weatherApp = (function(){
                 malleables.currentDate = thisDate;
                 currentDate = thisDate;
             }
-            if (benchmarkTime !== thisTime){
-                return [thisTime, currentDate]
-            }
 
-            return [dateString, currentDate,thisTime]
+            return [currentDate,thisTime]
     
         }
 
@@ -96,18 +93,9 @@ const weatherApp = (function(){
                 //Call timeHarmoniser function
                 let dateChecked = timeHarmoniser(last['Date']);
  
-                //Update date and time if necessary, else give time instead.
-                last['Date'] = dateChecked[0];
-
- 
-                if(last['Date'].length < 11){
-                    last['Time'] = dateChecked[0];
-                    delete last['Date'];
-                }
-                else {
-                    last['Date'] = dateFixer(dateChecked[1]);
-                    last['Time'] = dateChecked[2];
-                }
+                //Update date and time to correct format.
+                last['Date'] = dateFixer(dateChecked[0]);
+                last['Time'] = dateChecked[1];
 
             }
         }
@@ -139,7 +127,7 @@ const weatherApp = (function(){
 
         let guardForVisibility = function(obj,component){
             if(obj.hasOwnProperty('Time')){
-                if(obj.hasOwnProperty('Date')){
+                if(obj['Time'] === malleables.benchmarkTime){
                     malleables.hidden = false;
                     
                 }
