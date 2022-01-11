@@ -155,28 +155,32 @@ const weatherApp = (function(){
         const weatherTextHandler = function(obj,component){
             const dateAndTime = function(){
                 component.textContent = `${Object.values(obj)[0]} ${Object.values(obj)[1]}`
+                component.classList.toggle('Time',true)
                 return
 
             }
             const metricSpecificData = function(){
                 if(obj.hasOwnProperty('humidity')){
-                    component.textContent = `${Object.entries(obj)[0][1]}% ${Object.entries(obj)[0][0]}`
+                    component.textContent = `${Object.entries(obj)[0][1]}% ${Object.entries(obj)[0][0]}`;
+                    component.classList.toggle(`${Object.entries(obj)[0][0]}`,true);
                     return 
                 }
                 else if (obj.hasOwnProperty('feels like')){
-                    component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`
+                    component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`;
+                    component.classList.toggle('feelsLike',true)
                     return
 
                 }
                 else {
-                    component.textContent = `${Object.values(obj)[0]}\u2109`
+                    component.textContent = `${Object.values(obj)[0]}\u2109`;
+                    component.classList.toggle(`${Object.keys(obj)[0]}`,true)
                     return
                 }
 
             }
             const forecast = function(){
                 component.textContent = `${Object.values(obj)[0]}`
-                //component.classList.toggle('forecast');
+                component.classList.toggle(`${Object.keys(obj)[0]}`,true)
                 return
 
             }
