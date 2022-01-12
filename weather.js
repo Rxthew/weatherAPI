@@ -14,6 +14,7 @@ const weatherApp = (function(){
             Array.from(weatherContainer.children).forEach(
                 node => node.remove()
             )
+            document.querySelector('#tempContainer').remove()
         }
     }
 
@@ -126,6 +127,56 @@ const weatherApp = (function(){
             return
         })()
         removePriorData();
+
+        const addTemperatureToggler = (function(){
+            
+            const weatherInput = document.querySelector('#weatherInput');
+            
+            const tempContainer = document.createElement('div');
+            tempContainer.id = 'tempContainer';
+
+            const fahrenheit = document.createElement('span');
+            fahrenheit.id = 'fahrenheit'
+            fahrenheit.textContent = '\u2109'
+            tempContainer.appendChild(fahrenheit);
+            
+            const tempToggler = document.createElement('div');
+            tempToggler.id = 'tempToggler'
+            tempContainer.appendChild(tempToggler)
+
+            const celsius = document.createElement('span');
+            celsius.id = 'celsius';
+            celsius.textContent = '\u2103'
+            tempContainer.appendChild(celsius)
+
+
+            weatherInput.appendChild(tempContainer);
+
+            const tempTogglerContents = (function(){
+                const tempButton = document.createElement('button');
+                tempButton.id = 'temperatureBtn'                                
+
+                tempToggler.appendChild(tempButton);
+            })()
+
+            const toggleTemperature = function(){
+                const btn = document.querySelector('#temperatureBtn');
+                if (btn.classList.contains('toggleFahrenheit')){
+                    btn.classList.toggle('toggleFahrenheit',false);
+                    btn.classList.toggle('toggleCelsius',true);
+                }
+                else if(btn.classList.contains('toggleCelsius')){
+                    btn.classList.toggle('toggleCelsius',false);
+                    btn.classList.toggle('toggleFahrenheit',true);   
+                }
+                else{
+                    btn.classList.toggle('toggleCelsius',true);
+                }
+            }
+
+            tempToggler.onclick = toggleTemperature
+
+        })()
 
         let toggleHideData = function(someElement){
             let hidden = malleables.hidden;
