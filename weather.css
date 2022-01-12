@@ -104,6 +104,31 @@ span {
     flex-direction: column;
     background-color:white;
     box-shadow: 0 3px 10px #ebebeb
+}
+
+
+
+#spin{
+    animation: spinning 1.8s linear infinite;
+    border: 8px solid white;
+    border-top: 8px solid black;
+    border-bottom: 8px solid black;
+    border-radius: 50%;
+    width: 5rem;
+    height: 5rem;
+   
+}
+
+@keyframes spinning {
+    0% {  
+        transform: rotate(0deg);
+
+    }
+
+    100% { 
+        transform: rotate(360deg);
+        
+    }
 
 }
 

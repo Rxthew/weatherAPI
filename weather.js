@@ -1,12 +1,22 @@
 
 const weatherApp = (function(){
     const submit = document.querySelector('#submitCity')
+    const weatherContainer = document.querySelector('#weatherContainer');
     const key = 'def79d73d53551dbf22c188d97884e98';
     const malleables = {
         'currentDate': '1500-01-01',
         'benchmarkTime': '25:00:00',
          'hidden' : false
     }
+
+    const removePriorData = function(){
+        if(weatherContainer.children.length > 0){
+            Array.from(weatherContainer.children).forEach(
+                node => node.remove()
+            )
+        }
+    }
+
     const parseWeatherData = function(weatherData){
        
         //Array of labels to be used, and object keys from weatherData to return values we need//
@@ -108,15 +118,14 @@ const weatherApp = (function(){
         
     const weatherObjectToDOM = function(finalArray){
 
-        const weatherContainer = document.querySelector('#weatherContainer');
-
-        const removePriorData = (function(){
-            if(weatherContainer.children.length > 0){
-                Array.from(weatherContainer.children).forEach(
-                    node => node.remove()
-                )
+        const removeLoadingSpinner = (function(){
+            let spinner = document.querySelector('#spin')
+            if(spinner){
+                spinner.remove()
             }
+            return
         })()
+        removePriorData();
 
         let toggleHideData = function(someElement){
             let hidden = malleables.hidden;
@@ -263,10 +272,8 @@ const weatherApp = (function(){
                     return document.querySelector('.mainCard')
                 })()
                 
-                //let component = document.createElement('span');
                 let component = componentHandler(obj)
                 guardForVisibility(obj, component)
-                //weatherTextHandler(obj, component)
                 card.appendChild(component)
 
                 
@@ -302,6 +309,16 @@ const weatherApp = (function(){
                         //.then(function(info){console.log(parseWeatherData(info))})
                         .then(function(info){return parseWeatherData(info)})
                         .then(function(weatherObj){return weatherObjectToDOM(weatherObj)})
+
+                        const loader = (function(){
+                            if(document.querySelector("#spin")){
+                                return
+                            }
+                            removePriorData()
+                            const spinner = document.createElement('div');
+                            spinner.id = 'spin'
+                            weatherContainer.appendChild(spinner);
+                        })()
     }
     submit.addEventListener('click', weatherData);
 })()
