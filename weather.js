@@ -262,17 +262,66 @@ const weatherApp = (function(){
                 
         }
 
-        const timeToggler = function(){
-            //two buttons attached to a Time component: next and previous
-            // Next -> 1. goes up tree until get to card div.
-            // 2. Finds the index of event's target 'Time' span within card's children
-            // 3. Toggle none on that Time component
-            // 4. Starts there iterating through card div's children, looking for next Time class. 
-            // 4.5 In the meantime, if it's not a time class then toggle none
-            // 4. Once next time class is found toggle none off on that time class
-            // 5. Keep iterating and toggling time off on the next elements until you reach the next Time.
-            //2 problems:
-            // also: what if the Time is 21:00
+        const timeToggler = function(event){
+            const referencePoint = event.target.parentElement;
+            const currentTimeInput = referencePoint.children[2];
+            const cardChildren = Array.from(referencePoint.parentElement.children);
+
+            const hideCurrent = function(){
+                for(let i = cardChildren.indexOf(referencePoint); i < cardChildren.length; i++){
+                    let target = cardChildren[i];
+                    if(target.classList.contains('Time') && target !== referencePoint){
+                        return i
+                    }
+                    target.classList.toggle('none',true)
+              }
+            }
+
+            const laterVersion = function(currentIndex){
+                
+                for(let i = currentIndex;i < cardChildren.length; i++){
+
+                    let reveal = cardChildren[i];
+                    if(reveal.classList.contains('Time') && reveal !== cardChildren[currentIndex]){
+                        return
+                    }
+                    reveal.classList.toggle('none',false);
+
+                    }
+            }
+
+            const earlierVersion = function(){
+
+                for(let i = cardChildren.indexOf(referencePoint) - 1;i >= 0; i--){
+                    let reveal = cardChildren[i];
+                    if(reveal.classList.contains('Time')){
+                        reveal.classList.toggle('none',false);
+                        return
+                    }
+                    reveal.classList.toggle('none',false);
+                    }
+            }
+            
+            const executeToggle = (function(){
+
+                if(event.target.classList.contains('later')){
+                    if(currentTimeInput.value === '21:00:00'){
+                        //event.target buttonDisabled CSS effects 
+                        return
+                    }
+                    let ind = hideCurrent();
+                    laterVersion(ind)
+                }
+                else if(event.target.classList.contains('earlier')){
+                    if(cardChildren[0] === referencePoint){
+                        //event.target buttonDisabled CSS effects
+                        return 
+                    }
+                    hideCurrent()
+                    earlierVersion()   
+                }
+
+            })()
             return
         }
 
