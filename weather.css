@@ -62,7 +62,7 @@ main {
     background-color: white;
 }
 
-#fahrenheit, #celsius{
+#fahrenheitSelect, #celsiusSelect{
       margin: 0.25rem;
 }
 
@@ -80,7 +80,7 @@ main {
 
 #tempToggler:hover{
     border: 2px solid blue;
-    background-color: rgb(253, 139, 139)
+    
 
 }
 
@@ -109,12 +109,22 @@ main {
 }
 
 @keyframes toggleRight {
-    50%{
-        right: 50%
+    0% {
+        border: 2px solid red;
+        transform: rotate(0deg)
     }
 
-    100% { 
-        right: 0;
+    50%{
+        right: 50%;
+        border: 2px solid green;
+
+
+        
+    }
+
+    100% {
+        transform: rotate(360deg); 
+        right: 0;        
         
     }
 
@@ -123,14 +133,19 @@ main {
 @keyframes toggleLeft {
     0%{
         right: 0;
+        border: 2px solid red;
+        transform: rotate(0deg)
     }
 
     50%{
-        right: 50%
+        right: 50%;
+        border: 2px solid green;
     }
 
-    100% { 
+    100% {
+        transform: rotate(-360deg); 
         right: auto;
+        
         
     }
 

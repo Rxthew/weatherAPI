@@ -128,6 +128,45 @@ const weatherApp = (function(){
         })()
         removePriorData();
 
+        const temperatureConvertor = function(){
+
+            const temperatureSlicer = function(tempString){
+                const firstOutput = tempString.slice(0,tempString.length - 3);
+                const metricUnit = tempString.slice(tempString.length - 3,);
+
+                if(firstOutput.length > 5){
+                    const feelsLike = firstOuput.slice(0,10);
+                    const digits = firstOutput.slice(11,);
+                    return [digits, metricUnit,feelsLike]
+                }
+
+                else{
+                    return[firstOutput, metricUnit]
+                }
+
+            }
+
+            const tempAlgoApply = function(){
+
+            }
+            //problem with feels like *****need a filter for that.
+            //string slicer helper function ->
+            //takes a string and slices away last two character
+            //returns the main part and the sliced part in an array.
+
+            //helper formula application, takes 2 string parameters, converts first to a number
+            //if it's not NAN then checks the second parameter to see if celsius or Fahren
+            //applies the formula accordingy and returns the string version of the number
+            //with the appropriate corresponding metric unit. 
+
+            //if doc query selector fahrenheit.
+            //then doc queryselectorall fahrenheit and forEach one apply
+            //string slicer, then formula application as textContent.
+            //else if query selector celsius
+            //do the same thing.
+            //
+        }
+
         const addTemperatureToggler = (function(){
             
             const weatherInput = document.querySelector('#weatherInput');
@@ -136,7 +175,7 @@ const weatherApp = (function(){
             tempContainer.id = 'tempContainer';
 
             const fahrenheit = document.createElement('span');
-            fahrenheit.id = 'fahrenheit'
+            fahrenheit.id = 'fahrenheitSelect'
             fahrenheit.textContent = '\u2109'
             tempContainer.appendChild(fahrenheit);
             
@@ -145,7 +184,7 @@ const weatherApp = (function(){
             tempContainer.appendChild(tempToggler)
 
             const celsius = document.createElement('span');
-            celsius.id = 'celsius';
+            celsius.id = 'celsiusSelect';
             celsius.textContent = '\u2103'
             tempContainer.appendChild(celsius)
 
@@ -266,13 +305,15 @@ const weatherApp = (function(){
                 }
                 else if (obj.hasOwnProperty('feels like')){
                     component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`;
-                    component.classList.toggle('feelsLike',true)
+                    component.classList.toggle('feelsLike',true);
+                    component.classList.toggle('fahrenheit',true);
                     return component
 
                 }
                 else {
                     component.textContent = `${Object.values(obj)[0]}\u2109`;
                     component.classList.toggle(`${Object.keys(obj)[0]}`,true)
+                    component.classList.toggle('fahrenheit',true);
                     return component
                 }
 
