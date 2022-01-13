@@ -131,11 +131,11 @@ const weatherApp = (function(){
         const temperatureConvertor = function(){
 
             const temperatureSlicer = function(tempString){
-                const firstOutput = tempString.slice(0,tempString.length - 3);
-                const metricUnit = tempString.slice(tempString.length - 3,);
+                const firstOutput = tempString.slice(0,tempString.length - 1);
+                const metricUnit = tempString.slice(tempString.length - 1,);
 
-                if(firstOutput.length > 5){
-                    const feelsLike = firstOuput.slice(0,10);
+                if(isNaN(+firstOutput[0])){
+                    const feelsLike = firstOutput.slice(0,11);
                     const digits = firstOutput.slice(11,);
                     return [digits, metricUnit,feelsLike]
                 }
@@ -146,25 +146,47 @@ const weatherApp = (function(){
 
             }
 
-            const tempAlgoApply = function(){
+            const tempAlgoApply = function(valuesArray){
+                let finalString;
+                const digits = +(valuesArray[0]);
+                const metricUnit = valuesArray[1];
+                const feelsLike = valuesArray.length > 2 ? valuesArray[2] : null;
+                
+                if(isNaN(digits)){
+                    return
+                };
+                
+                const sliceNumberLength = function(numberString){
+                     if(numberString.length > 6){
+                        numberString = numberString.slice(0,6)
+                     }
+                     return numberString
+                }
 
+                if(metricUnit === '\u2109'){
+                    let cels = (digits-32)/1.8
+                    finalString = sliceNumberLength(cels.toString()) + '\u2103'
+
+                }
+                else if(metricUnit === '\u2103'){
+                   let fahren = (digits * 1.8) + 32
+                    finalString = sliceNumberLength(fahren.toString()) + '\u2109'
+                }
+
+                if(feelsLike){
+                    finalString = feelsLike + finalString;
+                }
+                return finalString
             }
-            //problem with feels like *****need a filter for that.
-            //string slicer helper function ->
-            //takes a string and slices away last two character
-            //returns the main part and the sliced part in an array.
+            
+            const convert = (function(){
+                tempsConverted = Array.from(document.querySelectorAll('.metricUnit'));
+                for (let elem of tempsConverted){
+                    let current = elem.textContent;
+                    elem.textContent = tempAlgoApply(temperatureSlicer(current))
+                }
+            })() 
 
-            //helper formula application, takes 2 string parameters, converts first to a number
-            //if it's not NAN then checks the second parameter to see if celsius or Fahren
-            //applies the formula accordingy and returns the string version of the number
-            //with the appropriate corresponding metric unit. 
-
-            //if doc query selector fahrenheit.
-            //then doc queryselectorall fahrenheit and forEach one apply
-            //string slicer, then formula application as textContent.
-            //else if query selector celsius
-            //do the same thing.
-            //
         }
 
         const addTemperatureToggler = (function(){
@@ -198,7 +220,7 @@ const weatherApp = (function(){
                 tempToggler.appendChild(tempButton);
             })()
 
-            const toggleTemperature = function(){
+            const toggleTemperatureButton = function(){
                 const btn = document.querySelector('#temperatureBtn');
                 if (btn.classList.contains('toggleFahrenheit')){
                     btn.classList.toggle('toggleFahrenheit',false);
@@ -213,7 +235,8 @@ const weatherApp = (function(){
                 }
             }
 
-            tempToggler.onclick = toggleTemperature
+            tempToggler.addEventListener('click',toggleTemperatureButton);
+            tempToggler.addEventListener('click', temperatureConvertor);
 
         })()
 
@@ -306,14 +329,14 @@ const weatherApp = (function(){
                 else if (obj.hasOwnProperty('feels like')){
                     component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`;
                     component.classList.toggle('feelsLike',true);
-                    component.classList.toggle('fahrenheit',true);
+                    component.classList.toggle('metricUnit',true);
                     return component
 
                 }
                 else {
                     component.textContent = `${Object.values(obj)[0]}\u2109`;
                     component.classList.toggle(`${Object.keys(obj)[0]}`,true)
-                    component.classList.toggle('fahrenheit',true);
+                    component.classList.toggle('metricUnit',true);
                     return component
                 }
 
