@@ -18,8 +18,36 @@ const weatherApp = (function(){
         }
     }
 
+    const errorCard = class{
+        constructor(error){
+            this.error = error
+        }
+
+        closeErrorCard = function(errCard){
+            errCard.classList.toggle('closeError',true);
+            errCard.remove();
+        }
+
+        makeErrorCard = function(){
+            let closeError = this.closeErrorCard;
+            let openErrorCard = document.querySelector('.errorCard')
+            if(openErrorCard){
+                closeError(openErrorCard)
+                return
+            }
+
+            let msg = document.createElement('div');
+            msg.textContent = this.error;
+            msg.classList.toggle('errorCard',true)
+            document.body.appendChild(msg);
+            
+            document.body.addEventListener('click', function(){
+                closeError(msg)}, {once:true})      
+        }
+    }
+
     const parseWeatherData = function(weatherData){
-       
+   
         //Array of labels to be used, and object keys from weatherData to return values we need//
         const labelsAndTargets = 
         [
@@ -60,7 +88,6 @@ const weatherApp = (function(){
         
         const parseAllValues = function(){
             const finalArray = []
-            
 
             for (let elem of weatherData.list){
                 parseIndividualValue(labelsAndTargets, finalArray, elem);
@@ -308,16 +335,21 @@ const weatherApp = (function(){
 
                 if(event.target.classList.contains('later')){
                     if(currentTimeInput.value === '21:00:00'){
-                        //event.target buttonDisabled CSS effects 
+                        event.stopPropagation()
+                        let error = new errorCard('This is the last report for the day. ');
+                        error.makeErrorCard()
                         return
+                       
                     }
                     let ind = hideCurrent();
                     laterVersion(ind)
                 }
                 else if(event.target.classList.contains('earlier')){
                     if(cardChildren[0] === referencePoint){
-                        //event.target buttonDisabled CSS effects
-                        return 
+                        event.stopPropagation()
+                        let error = new errorCard('There are no earlier reports available for the day.');
+                        error.makeErrorCard()
+                        return
                     }
                     hideCurrent()
                     earlierVersion()   
@@ -475,6 +507,11 @@ const weatherApp = (function(){
                         //.then(function(info){console.log(parseWeatherData(info))})
                         .then(function(info){return parseWeatherData(info)})
                         .then(function(weatherObj){return weatherObjectToDOM(weatherObj)})
+                        .catch(function(){
+                            let error = new errorCard('This is a test');
+                            error.makeErrorCard();
+                            return
+                        })
 
                         const loader = (function(){
                             if(document.querySelector("#spin")){
