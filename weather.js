@@ -32,6 +32,11 @@ const weatherApp = (function(){
 
         ];
 
+
+       const kalvinToFahrenheit = function(num){
+            return parseInt(((num-273.15)*1.8)+32).toString()
+              
+       }
         
         const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
             for (let someLabelAndTarget of someLabelsAndTargets){
@@ -43,6 +48,10 @@ const weatherApp = (function(){
                 if(weatherListElem.hasOwnProperty(target)){
 
                     weatherObj[label] = weatherListElem[target];
+                    
+                    if(label === 'Temperature' || label === 'feels like'){
+                        weatherObj[label] = kalvinToFahrenheit(weatherObj[label])
+                    }
                     someFinalArray.push(weatherObj); 
                 }
                 
@@ -156,21 +165,14 @@ const weatherApp = (function(){
                     return
                 };
                 
-                const sliceNumberLength = function(numberString){
-                     if(numberString.length > 6){
-                        numberString = numberString.slice(0,6)
-                     }
-                     return numberString
-                }
-
                 if(metricUnit === '\u2109'){
                     let cels = (digits-32)/1.8
-                    finalString = sliceNumberLength(cels.toString()) + '\u2103'
+                    finalString = Math.round(cels) + '\u2103'
 
                 }
                 else if(metricUnit === '\u2103'){
                    let fahren = (digits * 1.8) + 32
-                    finalString = sliceNumberLength(fahren.toString()) + '\u2109'
+                    finalString = Math.round(fahren) + '\u2109'
                 }
 
                 if(feelsLike){
