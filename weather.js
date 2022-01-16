@@ -18,6 +18,14 @@ const weatherApp = (function(){
         }
     }
 
+    const removeLoadingSpinner = function(){
+        let spinner = document.querySelector('#spin')
+        if(spinner){
+            spinner.remove()
+        }
+        return
+    }
+
     const errorCard = class{
         constructor(error){
             this.error = error
@@ -33,16 +41,26 @@ const weatherApp = (function(){
             let openErrorCard = document.querySelector('.errorCard')
             if(openErrorCard){
                 closeError(openErrorCard)
-                return
             }
+            
 
-            let msg = document.createElement('div');
+            let card = document.createElement('div');
+            let msg = document.createElement('span');
+            let x = document.createElement('button');
+
             msg.textContent = this.error;
-            msg.classList.toggle('errorCard',true)
-            document.body.appendChild(msg);
+            x.textContent = '\u2716';
+
+            card.classList.add('errorCard');
+            msg.classList.add('msg');
+            x.classList.add('xButton');
+
+            card.appendChild(msg);
+            card.appendChild(x);
+            document.body.appendChild(card);
             
             document.body.addEventListener('click', function(){
-                closeError(msg)}, {once:true})      
+                closeError(card)}, {once:true})      
         }
     }
 
@@ -155,13 +173,7 @@ const weatherApp = (function(){
         
     const weatherObjectToDOM = function(finalArray){
 
-        const removeLoadingSpinner = (function(){
-            let spinner = document.querySelector('#spin')
-            if(spinner){
-                spinner.remove()
-            }
-            return
-        })()
+        removeLoadingSpinner()
         removePriorData();
 
         const temperatureConvertor = function(){
@@ -507,12 +519,28 @@ const weatherApp = (function(){
                         //.then(function(info){console.log(parseWeatherData(info))})
                         .then(function(info){return parseWeatherData(info)})
                         .then(function(weatherObj){return weatherObjectToDOM(weatherObj)})
-                        .catch(function(){
-                            let error = new errorCard('This is a test');
+                        .catch(function(e){     
+                            let error = (function(){
+                                if(e.message === 'weatherData.list is undefined'){
+                                    if(city.length === 0){
+                                        return new errorCard('Please enter the name of a city.')
+                                    }
+                                    return new errorCard(`No weather data is available for "${city}". Please enter the name of another city.`)
+                                }
+                                else if(e.message === 'NetworkError when attempting to fetch resource.'){
+                                    return new errorCard('There seem to be some connection problems. The data cannot be retrieved before these are solved.')
+
+                                }
+                                else{
+                                    return new errorCard('A problem has occurred. Please restart your browser.');
+                                }
+                            })() 
                             error.makeErrorCard();
+                            removeLoadingSpinner()
+                            
                             return
                         })
-
+                        
                         const loader = (function(){
                             if(document.querySelector("#spin")){
                                 return
