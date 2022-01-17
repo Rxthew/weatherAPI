@@ -35,7 +35,10 @@ main {
     align-items: center;
     margin: 1rem;
 
+}
 
+#weatherInput > span{
+    margin: 1rem;
 }
 
 #weatherContainer{
@@ -108,8 +111,8 @@ main {
 
 #temperatureBtn{
     border-radius: 100%;
-    border: 2px solid #B1D4E0;
-    background-color: #B1D4E0;
+    border: 2px solid #2E8BC0;
+    background-color: #2E8BC0;
     width: 1rem;
     height: 1rem;
     cursor: pointer;
