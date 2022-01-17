@@ -45,16 +45,20 @@ const weatherApp = (function(){
             
 
             let card = document.createElement('div');
+            let headline = document.createElement('span');
             let msg = document.createElement('span');
             let x = document.createElement('button');
 
             msg.textContent = this.error;
+            headline.textContent = 'Something went wrong.'
             x.textContent = '\u2716';
 
             card.classList.add('errorCard');
+            headline.classList.add('headline');
             msg.classList.add('msg');
             x.classList.add('xButton');
 
+            card.appendChild(headline);
             card.appendChild(msg);
             card.appendChild(x);
             document.body.appendChild(card);
@@ -346,7 +350,7 @@ const weatherApp = (function(){
             const executeToggle = (function(){
 
                 if(event.target.classList.contains('later')){
-                    if(currentTimeInput.value === '21:00:00'){
+                    if(currentTimeInput.textContent === '21:00:00'){
                         event.stopPropagation()
                         let error = new errorCard('This is the last report for the day. ');
                         error.makeErrorCard()
@@ -386,17 +390,16 @@ const weatherApp = (function(){
 
                 const earlierButton = (function(){
                     let earlier = document.createElement('button');
-                    earlier.textContent = 'Earlier';
+                    earlier.textContent = '\u23F4';
                     earlier.classList.toggle('earlier',true);
                     earlier.addEventListener('click',timeToggler)
                     div.appendChild(earlier);                   
                 })()
             
                 const timeText = (function(){
-                    let component = document.createElement('input');
-                    component.setAttribute('type','text');
-                    component.setAttribute('readonly',true);
-                    component.value = `${Object.values(obj)[1]}`
+
+                    let component = document.createElement('span');
+                    component.textContent = `${Object.values(obj)[1]}`
                     component.classList.toggle('timeText',true)
                     div.appendChild(component);
                     
@@ -404,7 +407,7 @@ const weatherApp = (function(){
 
                 const laterButton = (function(){
                     let later = document.createElement('button');
-                    later.textContent = 'Later';
+                    later.textContent = '\u23F5';
                     later.classList.toggle('later',true);
                     later.addEventListener('click',timeToggler)
                     div.appendChild(later);
