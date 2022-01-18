@@ -70,7 +70,6 @@ main {
     border: 2px solid #b1c1c9;
     border-radius:10px;
     padding: 0.5rem;
-    overflow-x: scroll;
 }
 
 #tempContainer{
@@ -202,6 +201,10 @@ main {
 
 .xButton:hover{
     opacity: 1;
+}
+
+.sessionCelsius{
+    right: 0;
 }
 
 .toggleCelsius{

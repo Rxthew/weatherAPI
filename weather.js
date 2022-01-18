@@ -9,6 +9,7 @@ const weatherApp = (function(){
          'hidden' : false
     }
 
+
     const removePriorData = function(){
         if(weatherContainer.children.length > 0){
             Array.from(weatherContainer.children).forEach(
@@ -24,6 +25,13 @@ const weatherApp = (function(){
             spinner.remove()
         }
         return
+    }
+
+    const setTemperatureState = function(){
+        if(document.querySelector('.toggleCelsius') || document.querySelector('.sessionCelsius')){
+            sessionStorage.setItem('sessionCelsius',true);
+            return
+        }
     }
 
     const errorCard = class{
@@ -83,9 +91,15 @@ const weatherApp = (function(){
         ];
 
 
-       const kalvinToFahrenheit = function(num){
+       const kelvinToFahrenheit = function(num){
             return parseInt(((num-273.15)*1.8)+32).toString()
               
+       }
+
+       const kelvinToCelsius = function(num){
+           return parseInt(num - 273.15).toString();
+
+
        }
         
         const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
@@ -100,7 +114,13 @@ const weatherApp = (function(){
                     weatherObj[label] = weatherListElem[target];
                     
                     if(label === 'Temperature' || label === 'feels like'){
-                        weatherObj[label] = kalvinToFahrenheit(weatherObj[label])
+                        if(sessionStorage.getItem('sessionCelsius')){
+                            weatherObj[label] = kelvinToCelsius(weatherObj[label])
+                        }
+                        else {
+                            weatherObj[label] = kelvinToFahrenheit(weatherObj[label])
+                        }
+                        
                     }
                     someFinalArray.push(weatherObj); 
                 }
@@ -248,7 +268,7 @@ const weatherApp = (function(){
             
             const tempToggler = document.createElement('div');
             tempToggler.id = 'tempToggler'
-            tempContainer.appendChild(tempToggler)
+            tempContainer.appendChild(tempToggler);
 
             const celsius = document.createElement('span');
             celsius.id = 'celsiusSelect';
@@ -263,6 +283,13 @@ const weatherApp = (function(){
                 tempButton.id = 'temperatureBtn'                                
 
                 tempToggler.appendChild(tempButton);
+
+                const assignSessionChoice = (function(){
+                    if(sessionStorage.getItem('sessionCelsius')){
+                        tempButton.classList.add('sessionCelsius');
+                        sessionStorage.removeItem('sessionCelsius')
+                    }
+                })()
             })()
 
             const toggleTemperatureButton = function(){
@@ -274,6 +301,10 @@ const weatherApp = (function(){
                 else if(btn.classList.contains('toggleCelsius')){
                     btn.classList.toggle('toggleCelsius',false);
                     btn.classList.toggle('toggleFahrenheit',true);   
+                }
+                else if(btn.classList.contains('sessionCelsius')){
+                    btn.classList.toggle('sessionCelsius', false);
+                    btn.classList.toggle('toggleFahrenheit',true);
                 }
                 else{
                     btn.classList.toggle('toggleCelsius',true);
@@ -425,14 +456,26 @@ const weatherApp = (function(){
                     return component
                 }
                 else if (obj.hasOwnProperty('feels like')){
-                    component.textContent = `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109`;
+                    component.textContent = (function(){
+                      if(document.querySelector('.sessionCelsius')){
+                          return `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2103`
+                      }   
+                      else {return `${Object.entries(obj)[0][0]} ${Object.entries(obj)[0][1]}\u2109` }  
+
+                    })();
                     component.classList.toggle('feelsLike',true);
                     component.classList.toggle('metricUnit',true);
                     return component
 
                 }
                 else {
-                    component.textContent = `${Object.values(obj)[0]}\u2109`;
+                    component.textContent = (function(){
+                        if(document.querySelector('.sessionCelsius')){
+                            return `${Object.values(obj)[0]}\u2103`
+                        }   
+                        else {return `${Object.values(obj)[0]}\u2109` }  
+  
+                      })();
                     component.classList.toggle(`${Object.keys(obj)[0]}`,true)
                     component.classList.toggle('metricUnit',true);
                     return component
@@ -535,6 +578,7 @@ const weatherApp = (function(){
 
                                 }
                                 else{
+                                    console.error(e);
                                     return new errorCard('A problem has occurred. Please restart your browser.');
                                 }
                             })() 
@@ -548,6 +592,7 @@ const weatherApp = (function(){
                             if(document.querySelector("#spin")){
                                 return
                             }
+                            setTemperatureState();
                             removePriorData()
                             const spinner = document.createElement('div');
                             spinner.id = 'spin'
