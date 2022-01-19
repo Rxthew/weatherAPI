@@ -117,7 +117,8 @@ main {
     height: 1rem;
     cursor: pointer;
     position: absolute;
-    pointer-events: none;      
+    pointer-events: none;   
+    -webkit-appearance: none;   
 }
 
 #spin{
