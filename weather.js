@@ -421,7 +421,7 @@ const weatherApp = (function(){
 
                 const earlierButton = (function(){
                     let earlier = document.createElement('button');
-                    earlier.textContent = '⏴';
+                    earlier.textContent = '<';
                     earlier.classList.toggle('earlier',true);
                     earlier.addEventListener('click',timeToggler)
                     div.appendChild(earlier);                   
@@ -438,7 +438,7 @@ const weatherApp = (function(){
 
                 const laterButton = (function(){
                     let later = document.createElement('button');
-                    later.textContent = '⏵';
+                    later.textContent = '>';
                     later.classList.toggle('later',true);
                     later.addEventListener('click',timeToggler)
                     div.appendChild(later);
