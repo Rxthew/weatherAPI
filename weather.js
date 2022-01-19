@@ -97,7 +97,7 @@ const weatherApp = (function(){
        }
 
        const kelvinToCelsius = function(num){
-           return parseInt(num - 273.15).toString();
+           return Math.ceil(num - 273.15).toString();
 
 
        }
@@ -116,6 +116,7 @@ const weatherApp = (function(){
                     if(label === 'Temperature' || label === 'feels like'){
                         if(sessionStorage.getItem('sessionCelsius')){
                             weatherObj[label] = kelvinToCelsius(weatherObj[label])
+                            console.log(weatherObj[label])
                         }
                         else {
                             weatherObj[label] = kelvinToFahrenheit(weatherObj[label])
@@ -189,8 +190,7 @@ const weatherApp = (function(){
             }
         }
 
-        
-        return parseAllValues()    
+        return parseAllValues()   
         
         }
        
@@ -203,10 +203,11 @@ const weatherApp = (function(){
         const temperatureConvertor = function(){
 
             const temperatureSlicer = function(tempString){
+
                 const firstOutput = tempString.slice(0,tempString.length - 1);
                 const metricUnit = tempString.slice(tempString.length - 1,);
 
-                if(isNaN(+firstOutput[0])){
+                if(isNaN(+firstOutput)){
                     const feelsLike = firstOutput.slice(0,11);
                     const digits = firstOutput.slice(11,);
                     return [digits, metricUnit,feelsLike]
@@ -230,12 +231,12 @@ const weatherApp = (function(){
                 
                 if(metricUnit === '\u2109'){
                     let cels = (digits-32)/1.8
-                    finalString = Math.round(cels) + '\u2103'
+                    finalString = Math.ceil(cels) + '\u2103'
 
                 }
                 else if(metricUnit === '\u2103'){
                    let fahren = (digits * 1.8) + 32
-                    finalString = Math.round(fahren) + '\u2109'
+                    finalString = parseInt(fahren) + '\u2109'
                 }
 
                 if(feelsLike){
