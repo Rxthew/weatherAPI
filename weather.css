@@ -1,5 +1,6 @@
 html {
-    box-sizing: border-box
+    box-sizing: border-box;
+    font-size: 16px;
 };
 
 *, *:before, *:after {
@@ -116,8 +117,7 @@ main {
     height: 1rem;
     cursor: pointer;
     position: absolute;
-    pointer-events: none;
-    -webkit-text-size-adjust: none;        
+    pointer-events: none;      
 }
 
 #spin{
