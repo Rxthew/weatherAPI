@@ -119,6 +119,8 @@ main {
     position: absolute;
     pointer-events: none;   
     -webkit-appearance: none;   
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
 }
 
 #spin{
