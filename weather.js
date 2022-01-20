@@ -97,12 +97,21 @@ const weatherApp = (function(){
        }
 
        const kelvinToCelsius = function(num){
-           return Math.ceil(num - 273.15).toString();
+           return parseInt(num - 273.15).toString();
 
 
        }
+
+       const setKelvinStorage = function(){
+        if(sessionStorage.getItem('kelvinArray')){
+            sessionStorage.removeItem('kelvinArray');
+            sessionStorage.setItem('kelvinArray',[])
+       }
+
+    }
         
         const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
+
             for (let someLabelAndTarget of someLabelsAndTargets){
     
                 const weatherObj = {};
@@ -116,7 +125,6 @@ const weatherApp = (function(){
                     if(label === 'Temperature' || label === 'feels like'){
                         if(sessionStorage.getItem('sessionCelsius')){
                             weatherObj[label] = kelvinToCelsius(weatherObj[label])
-                            console.log(weatherObj[label])
                         }
                         else {
                             weatherObj[label] = kelvinToFahrenheit(weatherObj[label])
@@ -131,6 +139,7 @@ const weatherApp = (function(){
         
         const parseAllValues = function(){
             const finalArray = []
+            setKelvinStorage()
 
             for (let elem of weatherData.list){
                 parseIndividualValue(labelsAndTargets, finalArray, elem);
@@ -219,7 +228,7 @@ const weatherApp = (function(){
 
             }
 
-            const tempAlgoApply = function(valuesArray){
+            const tempAlgoApply = function(valuesArray){//here 
                 let finalString;
                 const digits = +(valuesArray[0]);
                 const metricUnit = valuesArray[1];
@@ -231,7 +240,7 @@ const weatherApp = (function(){
                 
                 if(metricUnit === '\u2109'){
                     let cels = (digits-32)/1.8
-                    finalString = Math.ceil(cels) + '\u2103'
+                    finalString = parseInt(cels) + '\u2103'
 
                 }
                 else if(metricUnit === '\u2103'){
