@@ -79,6 +79,17 @@ const weatherApp = (function(){
         }
     }
 
+    const kelvinToFahrenheit = function(num){
+        return Math.round(((num-273.15)*1.8)+32).toString()
+          
+   }
+
+   const kelvinToCelsius = function(num){
+       return Math.round(num - 273.15).toString();
+
+
+   }
+
     const parseWeatherData = function(weatherData){
    
         //Array of labels to be used, and object keys from weatherData to return values we need//
@@ -93,27 +104,15 @@ const weatherApp = (function(){
 
         ];
 
-
-       const kelvinToFahrenheit = function(num){
-            return parseInt(((num-273.15)*1.8)+32).toString()
-              
-       }
-
-       const kelvinToCelsius = function(num){
-           return parseInt(num - 273.15).toString();
-
-
-       }
-
        const setKelvinStorage = function(){
         if(sessionStorage.getItem('kelvinArray')){
             sessionStorage.removeItem('kelvinArray');
-            sessionStorage.setItem('kelvinArray',[])
        }
+       sessionStorage.setItem('kelvinArray',JSON.stringify([]))
 
     }
-        
-        const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
+    
+       const parseIndividualValue = function(someLabelsAndTargets,someFinalArray,weatherListElem){
 
             for (let someLabelAndTarget of someLabelsAndTargets){
     
@@ -126,12 +125,21 @@ const weatherApp = (function(){
                     weatherObj[label] = weatherListElem[target];
                     
                     if(label === 'Temperature' || label === 'feels like'){
-                        if(sessionStorage.getItem('sessionCelsius')){
-                            weatherObj[label] = kelvinToCelsius(weatherObj[label])
-                        }
-                        else {
-                            weatherObj[label] = kelvinToFahrenheit(weatherObj[label])
-                        }
+
+                        const addToKelvinArray = (function(){
+                            let kelvinArr = JSON.parse(sessionStorage.getItem('kelvinArray'))
+                            kelvinArr.push(weatherObj[label]);
+                            sessionStorage.setItem('kelvinArray', JSON.stringify(kelvinArr));
+                        })()
+                        
+                        const convertFromKelvin = (function(){
+                            if(sessionStorage.getItem('sessionCelsius')){
+                                weatherObj[label] = kelvinToCelsius(weatherObj[label])
+                            }
+                            else {
+                                weatherObj[label] = kelvinToFahrenheit(weatherObj[label])
+                            }
+                        })()
                         
                     }
                     someFinalArray.push(weatherObj); 
@@ -155,7 +163,6 @@ const weatherApp = (function(){
         
         const setBenchmarkTime = function(timeString){
                let benchmarkTime = malleables.benchmarkTime;
-               console.log(benchmarkTime)
             if (benchmarkTime === '25:00:00'){
                 malleables.benchmarkTime = timeString
             }
@@ -174,7 +181,7 @@ const weatherApp = (function(){
             const thisDate = dateString.slice(0,10);
             const thisTime = dateString.slice(11,)
             let currentDate = malleables.currentDate;
-            let benchmarkTime = setBenchmarkTime(thisTime);
+            setBenchmarkTime(thisTime);
            
             if (currentDate !== thisDate){
                 malleables.currentDate = thisDate;
@@ -222,34 +229,27 @@ const weatherApp = (function(){
 
                 if(isNaN(+firstOutput)){
                     const feelsLike = firstOutput.slice(0,11);
-                    const digits = firstOutput.slice(11,);
-                    return [digits, metricUnit,feelsLike]
+                    return [metricUnit,feelsLike]
                 }
 
                 else{
-                    return[firstOutput, metricUnit]
+                    return[metricUnit]
                 }
 
             }
 
-            const tempAlgoApply = function(valuesArray){//here 
+            const tempAlgoApply = function(valuesArray,kelvinVal){
                 let finalString;
-                const digits = +(valuesArray[0]);
-                const metricUnit = valuesArray[1];
-                const feelsLike = valuesArray.length > 2 ? valuesArray[2] : null;
-                
-                if(isNaN(digits)){
-                    return
-                };
+                const digits = kelvinVal
+                const metricUnit = valuesArray[0];
+                const feelsLike = valuesArray.length > 1 ? valuesArray[1] : null;
                 
                 if(metricUnit === '\u2109'){
-                    let cels = (digits-32)/1.8
-                    finalString = parseInt(cels) + '\u2103'
+                    finalString = kelvinToCelsius(digits) + '\u2103'
 
                 }
                 else if(metricUnit === '\u2103'){
-                   let fahren = (digits * 1.8) + 32
-                    finalString = parseInt(fahren) + '\u2109'
+                    finalString = kelvinToFahrenheit(digits) + '\u2109'
                 }
 
                 if(feelsLike){
@@ -257,15 +257,21 @@ const weatherApp = (function(){
                 }
                 return finalString
             }
-            
+
             const convert = (function(){
-                tempsConverted = Array.from(document.querySelectorAll('.metricUnit'));
-                for (let elem of tempsConverted){
-                    let current = elem.textContent;
-                    elem.textContent = tempAlgoApply(temperatureSlicer(current))
+                let kelvinArray = JSON.parse(sessionStorage.getItem('kelvinArray'));
+
+                let tempsConverted = Array.from(document.querySelectorAll('.mainCard > .metricUnit'))
+                .concat(Array.from(document.querySelectorAll('#secondaryContainer > .card > .metricUnit')));
+                
+
+                for (let index = 0; index < tempsConverted.length; index++){
+                    let current = tempsConverted[index];
+                    let currentText = tempsConverted[index].textContent;
+                    let correspondingKelvinValue = kelvinArray[index];
+                    current.textContent =  tempAlgoApply(temperatureSlicer(currentText),correspondingKelvinValue)
                 }
             })() 
-
         }
 
         const addTemperatureToggler = (function(){
@@ -612,7 +618,7 @@ const weatherApp = (function(){
                                 return
                             }
                             setTemperatureState();
-                            removePriorData()
+                            removePriorData();
                             const spinner = document.createElement('div');
                             spinner.id = 'spin'
                             weatherContainer.appendChild(spinner);
