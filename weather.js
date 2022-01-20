@@ -3,11 +3,14 @@ const weatherApp = (function(){
     const submit = document.querySelector('#submitCity')
     const weatherContainer = document.querySelector('#weatherContainer');
     const key = 'def79d73d53551dbf22c188d97884e98';
-    const malleables = {
+    let malleablesMaker = function() {
+        return{
         'currentDate': '1500-01-01',
         'benchmarkTime': '25:00:00',
          'hidden' : false
+        }
     }
+    let malleables = malleablesMaker();
 
 
     const removePriorData = function(){
@@ -152,6 +155,7 @@ const weatherApp = (function(){
         
         const setBenchmarkTime = function(timeString){
                let benchmarkTime = malleables.benchmarkTime;
+               console.log(benchmarkTime)
             if (benchmarkTime === '25:00:00'){
                 malleables.benchmarkTime = timeString
             }
@@ -565,6 +569,12 @@ const weatherApp = (function(){
             }
         })()
 
+        const resetMalleablesState = (function(){
+            malleables = malleablesMaker();
+
+        })()
+        
+
         return
     }    
     
@@ -572,7 +582,6 @@ const weatherApp = (function(){
                          let city = document.querySelector('#cityInput').value;
                          fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=${key}`, {mode:'cors'})
                         .then(function(response){return response.json()})
-                        //.then(function(info){console.log(parseWeatherData(info))})
                         .then(function(info){return parseWeatherData(info)})
                         .then(function(weatherObj){return weatherObjectToDOM(weatherObj)})
                         .catch(function(e){     
