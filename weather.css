@@ -118,9 +118,7 @@ main {
     cursor: pointer;
     position: absolute;
     pointer-events: none;   
-    -webkit-appearance: none;   
-    -webkit-text-size-adjust: none;
-    text-size-adjust: none;
+    padding: 0;
 }
 
 #spin{
