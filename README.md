@@ -15,22 +15,30 @@ The default temperature metric is in degrees Fahrenheit but you can toggle this 
 ## Remarks 
 
 I made this app primarily to test my understanding of asynchronous Javascript by fetching data from [Open Weather](https//openweathermap.org) through their API.
-This was a relatively simple implementation, but it did help crystallise the intuition behind the difference between asyncrhonous calls and synchronous calls. 
+This was a relatively simple implementation, but it did help crystallise the intuition behind the difference between asynchronous calls and synchronous calls. 
 
-The core part of the learning experience occurred when I was implementing some basic error-handling. Notifications pop up if you attempt to toggle to a timestep that lies beyond the confines of the 24-hour period associated with the date on the card you are on (so attempting to fetch data after 21:00 or before 00:00). This also applies when you attempt to fetch data before the present three-hour period of the same day. 
+The core part of the learning experience occurred when I was implementing some basic error-handling. The context underlying this is that error notifications pop up if the user attempts to toggle to a timestep that lies beyond the date on the card they are toggling on (so attempting to fetch data after 21:00 or before 00:00). 
+##### This also applies when you attempt to fetch data before the present three-hour period of the same day. 
 
 <details style="font-size: smaller">
-    <summary style="margin: 1rem">Feel like going off on a tiny tangent with me?</summary>
+    <summary style="margin: 1rem">Before we continue do you feel like going off on a tiny tangent with me?</summary>
     <p style="margin: 1rem">If I were to spend more time on this, I would prioritise user experience more in the sense that if the user wants to go beyond the 24-hour period then either the card associated with the next/previous day's data is emphasised or the clock simply restarts the cycle.</p> 
 </details>
 
-Error notifications are generated through a class when you click the button to toggle the time (if you go out of bounds). At the closing stages of the routine, it attaches an event handler to the document's body. This is a click event that closes the error notification. The problem with this implementation is that the click event has yet to bubble upward when the handler has been registered, once that happens the notification is removed. In effect: it never appears.
+The error notifications are generated through a class when the user clicks the button to toggle the time in the fashion described above. At the closing stages of the routine, an event handler is attached to the document's body: this is a click event that closes the error notification.
+
+The problem with this implementation is that the click event has yet to bubble upward when the handler has been registered, once that happens the notification is removed. In effect: it never appears.
 
 Of course, this is is easily addressed by preventing the bubbling from occurring through `event.stopPropagation()`, but this begs the question: 
 ### What does all this have to do with asynchronous behaviour?
 
-Well, I applied the same error notification class to a catch statement in the Javascript Promise which is initialised when you click the button that makes the API call, and I let the event bubble up even after attaching the handler to the document's body. In spite of this, the notification shows up and the bubbling has no effect. My hypothesis was that the event's bubbling is part of the synchronous workflow, so the function is only called after the event has finished propagating.
-But I was not satisifed so I tested it with a function similar to the following blurb: 
+Well, I applied the same error notification class to a catch statement in the Javascript Promise which is initialised when you click the button that makes the API call, and I let the event bubble up even after attaching the handler to the document's body. 
+
+
+In spite of this, the notification shows up and the bubbling has *no effect*.
+
+My hypothesis was that the event's bubbling is part of the synchronous workflow, so the function is only called after the event has finished propagating.
+But I was not satisifed so I tested it with some code similar to the following blurb: 
 
 
 
@@ -52,12 +60,15 @@ But I was not satisifed so I tested it with a function similar to the following 
                         document.body.addEventListener('click', dummyFunction)
 
 
-Note: this branches off from when the catch clause begins. 
+#### Note: this branches off from when the catch clause begins. 
 
-Here, dummyFunction is added synchronously because it is declared outside the catch clause. If the entire code was synchronous then you would expect the call
-stack to execute the functions in the order prescribed by the code flow, and if that was the case `document.querySelector('.dummy')` would return `null`, so 
-when you press the button, the event bubbles up then the handler attached to the body is called and an empty 'dummy' div is attached to the body, but there is
-no error notification because the condition was not fulfilled.  
+We can observe that dummyFunction is added synchronously because it is declared outside the catch clause. **If the entire code was synchronous** then one would expect the call stack to execute the functions in the order prescribed by the code flow, and if that was the case:
+
+1. When the user presses the button, `document.querySelector('.dummy')` would return `null`, so 
+2. The condition remains unfulfilled and the `errorCard` is never initialised, then
+3. The "dummy" function is declared, and the event handler is attached to the body, then
+4. The event bubbles up, the handler attached to the body is called and an empty 'dummy' div is attached to the body, ***but there is
+no error notification because the condition in the first steps was not fulfilled.***  
 
 But because the function in the catch clause is asynchronous, `dummyFunction` and `document.body.addEventListener('click',dummyFunction)` *have to be executed* before the callback from the catch clause can be retrieved from the callback queue. This means that in the asynchronous case:
 
