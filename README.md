@@ -7,7 +7,7 @@ This app provides a 5-day weather forecast, with a 3-hour timestep corresponding
 
 It starts off by providing the data for the 5 days to the nearest 3 hours from when it is fetched.
 
-The default temperature metric is in degrees Fahrenheit but you can toggle this to Celsius like so: 
+The default temperature metric is in degrees Fahrenheit but you can toggle this to Celsius. 
 
 ![weather app screenshot](./Asset/weatherAPI.png)
 
@@ -17,13 +17,7 @@ The default temperature metric is in degrees Fahrenheit but you can toggle this 
 I made this app primarily to test my understanding of asynchronous Javascript by fetching data from [Open Weather](https//openweathermap.org) through their API.
 This was a relatively simple implementation, but it did help crystallise the intuition behind the difference between asynchronous calls and synchronous calls. 
 
-The core part of the learning experience occurred when I was implementing some basic error-handling. The context underlying this is that error notifications pop up if the user attempts to toggle to a timestep that lies beyond the date on the card they are toggling on (so attempting to fetch data after 21:00 or before 00:00). 
-##### This also applies when you attempt to fetch data before the present three-hour period of the same day. 
-
-<details style="font-size: smaller">
-    <summary style="margin: 1rem">Before we continue do you feel like going off on a tiny tangent with me?</summary>
-    <p style="margin: 1rem">If I were to spend more time on this, I would prioritise user experience more in the sense that if the user wants to go beyond the 24-hour period then either the card associated with the next/previous day's data is emphasised or the clock simply restarts the cycle.</p> 
-</details>
+The core part of the learning experience occurred when I was implementing some basic error-handling. The context underlying this is that error notifications pop up if the user attempts to toggle to a timestep that lies beyond the date on the card they are toggling on (so attempting to fetch data after 21:00 or before 00:00). This also applies when you attempt to fetch data before the present three-hour period of the same day. 
 
 The error notifications are generated through a class when the user clicks the button to toggle the time in the fashion described above. At the closing stages of the routine, an event handler is attached to the document's body: this is a click event that closes the error notification.
 
@@ -94,6 +88,8 @@ Also, I retrieve all the data at once and let the user choose which parts to ren
 I would implement at all in an app I would expect actual traffic from. 
 
 Cross-browser testing was limited since I was relying on freeware so that is another limitation that can be mitigated to make the app a lot more responsive.
+
+If I were to spend more time on this, I would prioritise user experience more when toggling between times in the sense that if the user wants to go beyond the 24-hour period then either the card associated with the next/previous day's data is emphasised or the clock simply restarts the cycle, instead of having error notifications pop up each time.
 
 
 Finally, and this is an important point: 
