@@ -11,6 +11,8 @@ The default temperature metric is in degrees Fahrenheit but you can toggle this 
 
 ![weather app screenshot](./Asset/weatherAPI.png)
 
+[Live Demo](https://rxthew.github.io/weatherAPI)
+
 
 ## Remarks 
 
